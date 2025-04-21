@@ -1,6 +1,5 @@
 
-This microservice implements an in-memory Token Bucket rate limiting algorithm to smooth out request bursts and maintain API stability without external storage.
-
+This microservice implements an in-memory Token Bucket rate limiting algorithm
 # Key Features
 
 - Algorithm: Token Bucket

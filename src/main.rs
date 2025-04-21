@@ -36,4 +36,4 @@ async fn main() -> std::io::Result<()> {
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("More Points Pls")
-}
+} 

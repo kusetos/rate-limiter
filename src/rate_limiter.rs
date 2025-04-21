@@ -1,5 +1,3 @@
-// src/middleware/rate_limiter.rs
-
 use actix_web::{
     body::EitherBody,
     dev::{Service, ServiceRequest, ServiceResponse, Transform},
@@ -60,7 +58,6 @@ where
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let srv = self.service.clone();
 
-        // **Grab the Data<RateLimiterConfig> instead of RateLimiterConfig directly**
         let config = req
             .app_data::<Data<RateLimiterConfig>>()
             .expect("RateLimiterConfig not found in app data")
@@ -86,7 +83,6 @@ where
                     .to_string()
             };
 
-            // Token bucket refill + consume
             let mut map = buckets.lock().unwrap();
             let now = Instant::now();
             let (tokens, last) = map

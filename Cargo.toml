@@ -6,5 +6,6 @@ edition = "2024"
 [dependencies]
 actix-web = "4"
 actix-rt = "2"
-redis = "0.29.5"
 dotenv = "0.15"
+tokio = { version = "1", features = ["sync"] }
+futures-util = "0.3"

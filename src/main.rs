@@ -1,32 +1,32 @@
+mod rate_liminer;
+
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use dotenv::dotenv;
 use std::env;
-use redis::aio::ConnectionManager;
-use redis::Client;
+use std::sync::Mutex;
+use std::collections::HashMap;
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
-    let redis_url = env::var("REDIS_URL").unwrap_or_else(|_| "redis://127.0.0.1/".to_string());
-    let client = Client::open(redis_url).expect("Cannot create Redis client");
-    let manager = ConnectionManager::new(client)
-        .await
-        .expect("Cannot connect to Redis");
+    let capacity: f64 = env::var("CAPACITY").unwrap_or_else(|_| "100".into()).parse().unwrap();
+    let refill_rate: f64 = env::var("REFILL_RATE").unwrap_or_else(|_| "1".into()).parse().unwrap();
+    let client_id_header = env::var("CLIENT_ID").unwrap_or_else(|_| "ip".into());
 
-    let max_requests: u32 = env::var("MAX_REQUESTS").unwrap_or_else(|_| "100".to_string()).parse().unwrap();
-    let window_secs: usize = env::var("WINDOW_SECS").unwrap_or_else(|_| "60".to_string()).parse().unwrap();
-    let client_id_header = env::var("CLIENT_ID").unwrap_or_else(|_| "ip".to_string());
+    
+    let buckets = web::Data::new(Mutex::new(HashMap::<String, (f64, std::time::Instant)>::new()));
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(manager.clone()))
-            .app_data(web::Data::new(middleware::RateLimiterConfig {
-                max_requests,
-                window_secs,
+            .app_data(buckets.clone())
+            .app_data(web::Data::new(rate_liminer::RateLimiterConfig {
+                capacity,
+                refill_rate,
                 client_id_header: client_id_header.clone(),
             }))
-            .wrap(middleware::RateLimiter)
+            .wrap(rate_liminer::RateLimiter)
             .route("/", web::get().to(index))
     })
     .bind("0.0.0.0:8080")?
@@ -35,5 +35,5 @@ async fn main() -> std::io::Result<()> {
 }
 
 async fn index() -> impl Responder {
-    HttpResponse::Ok().body("Hello, world!")
+    HttpResponse::Ok().body("More Points Pls")
 }

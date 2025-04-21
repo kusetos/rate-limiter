@@ -1,0 +1,10 @@
+[package]
+name = "rate-limiter"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+actix-web = "4"
+actix-rt = "2"
+redis = "0.29.5"
+dotenv = "0.15"

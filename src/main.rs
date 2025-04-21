@@ -1,4 +1,4 @@
-mod rate_liminer;
+mod rate_limiter;
 
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use dotenv::dotenv;
@@ -21,12 +21,12 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(buckets.clone())
-            .app_data(web::Data::new(rate_liminer::RateLimiterConfig {
+            .app_data(web::Data::new(rate_limiter::RateLimiterConfig {
                 capacity,
                 refill_rate,
                 client_id_header: client_id_header.clone(),
             }))
-            .wrap(rate_liminer::RateLimiter)
+            .wrap(rate_limiter::RateLimiter)
             .route("/", web::get().to(index))
     })
     .bind("0.0.0.0:8080")?

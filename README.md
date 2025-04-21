@@ -4,8 +4,7 @@ This microservice implements an in-memory Token Bucket rate limiting algorithm
 
 - Algorithm: Token Bucket
 - Configurable: Bucket capacity, refill rate via environment variables
-- Actix-web middleware: Custom "RateLimiter" src/rate_limiter.rs, 
-
+- Actix-web middleware: Custom "RateLimiter" [rate limiter mod](src/rate_limiter.rs), 
 # How It Works
 
 1. Each client has a **bucket** with a maximum number of tokens (`CAPACITY`).
